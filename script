@@ -1,0 +1,112 @@
+#Query
+--Why are some products selling better than others?
+SELECT C.state, O.customer_id, P.product_name, P.model_year, P.price, P.product_id, SUM(O.quantity*O.price) AS revenue
+FROM Orders O, Customers C 
+LEFT JOIN Products P  
+ON O.product_id = P.product_id
+GROUP BY P.product_id
+ORDER BY revenue DESC
+LIMIT 5
+#Results
+state	customer_id	product_name	model_year	price	product_id	revenue
+NY	60	Trek Slash 8 27.5 - 2016	2016	3999.99	7	890117774.7
+NY	94	Trek Conduit+ - 2016	2016	2999.99	9	628572904.8
+NY	259	Trek Fuel EX 8 29 - 2016	2016	2899.99	4	599239433.7
+NY	91	Surly Straggler 650b - 2016	2016	1680.99	11	366783613.1
+NY	1302	Trek Domane SLR 6 Disc - 2017	2017	5499.99	56	341741878.7
+
+#Query
+--Which customers could be considered for a loyalty programme?
+SELECT C.customer_id, SUM(O.quantity*O.price) AS revenue
+FROM Orders O 
+LEFT JOIN Customers C  
+ON O.customer_id = C.customer_id
+GROUP BY C.customer_id
+ORDER BY revenue DESC
+LIMIT 5
+#Results
+customer_id	revenue
+"10"	"37801.84"
+"75"	"37500.89"
+"94"	"37138.86"
+"6"	"35857.86"
+"16"	"34503.82"
+
+#Query
+--Are there states with many customers but low revenue?
+SELECT C.state, O.customer_id, O.quantity, SUM(O.quantity*O.price) AS revenue
+FROM Orders O
+LEFT JOIN Customers C  
+ON O.customer_id = C.customer_id
+GROUP BY C.state
+ORDER BY revenue ASC
+LIMIT 5
+#Results
+state	customer_id	quantity	revenue
+TX	579	1	962600.76
+CA	175	2	1790145.91
+NY	1280	1	5826242.21
+
+#Query
+--Which products could benefit from additional marketing?
+SELECT O.product_id, O.quantity, P.product_name, SUM(O.quantity*O.price) AS revenue
+FROM Products P
+FULL JOIN Orders O  
+ON P.product_id = O.product_id
+GROUP BY P.product_name
+ORDER BY revenue DESC
+LIMIT 5
+#Results
+product_id	quantity	product_name	revenue
+7	2	Trek Slash 8 27.5 - 2016	615998.46
+9	2	Trek Conduit+ - 2016	434998.55
+4	1	Trek Fuel EX 8 29 - 2016	414698.57
+11	1	Surly Straggler 650b - 2016	253829.49
+56	1	Trek Domane SLR 6 Disc - 2017	236499.57
+
+#Query
+--Should low-performing products be discounted or discontinued?
+SELECT O.product_id, O.quantity, P.product_name, SUM(O.quantity*O.price) AS revenue
+FROM Products P
+FULL JOIN Orders O  
+ON P.product_id = O.product_id
+GROUP BY O.quantity
+ORDER BY revenue DESC
+LIMIT 5
+#Results
+product_id	quantity	product_name	revenue
+2	2	Ritchey Timberwolf Frameset - 2016	5705164.62
+2	1	Ritchey Timberwolf Frameset - 2016	2873824.26
+NULL	NULL	Trek 820 - 2016	NULL
+
+#Query
+--Are newer bicycle models performing better than older ones?
+SELECT O.product_id, O.quantity, P.product_name, SUM(O.quantity*O.price) AS revenue
+FROM Orders O
+FULL JOIN Products P   
+ON P.product_id = O.product_id
+GROUP BY P.model_year
+ORDER BY revenue DESC
+LIMIT 5
+#Results
+product_id	quantity	product_name	revenue
+27	1	Surly Big Dummy Frameset - 2017	3565031.81
+2	2	Ritchey Timberwolf Frameset - 2016	3555077.34
+112	1	Trek 820 - 2018	1458879.73
+NULL	NULL	Trek Checkpoint ALR 4 Women's - 2019	NULL
+
+#Query
+--Which regions could be good opportunities for expansion?
+SELECT C.state, O.product_id, O.quantity, P.product_name, SUM(O.quantity*O.price) AS revenue
+FROM Orders O, Customers C
+LEFT JOIN Products P   
+ON P.product_id = O.product_id
+GROUP BY C.state
+ORDER BY revenue DESC
+LIMIT 5
+#Results
+state	product_id	quantity	product_name	revenue
+NY	2	2	Ritchey Timberwolf Frameset - 2016	8741989669
+CA	2	2	Ritchey Timberwolf Frameset - 2016	2436432842
+TX	2	2	Ritchey Timberwolf Frameset - 2016	1218216421
+
